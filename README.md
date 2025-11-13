@@ -47,25 +47,27 @@
 
 Проект полностью готов к публикации на бесплатном хостинге GitHub Pages.
 
-1.  **Создайте новый репозиторий** на GitHub (например, `katya-pocket`).
+Приложение уже опубликовано и доступно по адресу: **https://tse4oev.github.io/kate-project/**
 
-2.  **Соберите приложение для продакшена.** Замените `your-repo-name` на имя вашего репозитория.
+Для повторного деплоя:
+
+1.  **Соберите приложение для продакшена.** Замените `your-repo-name` на имя вашего репозитория.
     ```bash
     npm run build -- --configuration=production --base-href=/your-repo-name/
     ```
     Эта команда создаст папку `build` с готовыми файлами.
 
-3.  **Установите `angular-cli-ghpages` для деплоя:**
+2.  **Установите `angular-cli-ghpages` для деплоя:**
     ```bash
     npm install -g angular-cli-ghpages
     ```
 
-4.  **Опубликуйте приложение:**
+3.  **Опубликуйте приложение:**
     ```bash
-    npx angular-cli-ghpages --dir=build
+    npx angular-cli-ghpages --dir=build --repo=https://github.com/tse4oev/kate-project.git
     ```
 
-Через несколько минут ваше приложение будет доступно по адресу `https://your-username.github.io/your-repo-name/`.
+Через несколько минут ваше приложение будет доступно по адресу `https://tse4oev.github.io/kate-project/`.
 
 ## ✅ Тестирование офлайн-режима
 
