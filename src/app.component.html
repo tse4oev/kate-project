@@ -1,0 +1,85 @@
+<!-- Основной контейнер приложения с тёмным фоном и вертикальным расположением элементов -->
+<div class="min-h-screen w-full bg-neutral-900 text-gray-300 p-4 sm:p-6 lg:p-8 flex flex-col items-center">
+
+  <!-- Контейнер с максимальной шириной для контента -->
+  <div class="w-full max-w-5xl mx-auto flex flex-col gap-8">
+  
+    <!-- Заголовок и навигация -->
+    <header class="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+      <h1 class="text-2xl sm:text-3xl font-serif text-violet-400 drop-shadow-sm">
+        {{ greeting() }}
+      </h1>
+      <!-- Навигационное меню -->
+      <nav class="flex items-center gap-2 sm:gap-4 bg-neutral-800/50 p-2 rounded-full shadow-sm">
+        <button (click)="setView('advice')" 
+                [class.bg-violet-500]="activeView() === 'advice'"
+                [class.text-white]="activeView() === 'advice'"
+                class="px-4 py-2 text-sm rounded-full transition-all duration-300 hover:bg-violet-500/20">
+          Советы
+        </button>
+        <button (click)="setView('notes')"
+                [class.bg-violet-500]="activeView() === 'notes'"
+                [class.text-white]="activeView() === 'notes'"
+                class="px-4 py-2 text-sm rounded-full transition-all duration-300 hover:bg-violet-500/20">
+          Заметки
+        </button>
+        <button (click)="setView('music')"
+                [class.bg-violet-500]="activeView() === 'music'"
+                [class.text-white]="activeView() === 'music'"
+                class="px-4 py-2 text-sm rounded-full transition-all duration-300 hover:bg-violet-500/20">
+          Музыка
+        </button>
+        <!-- Кнопка-заглушка для будущих разделов -->
+        <button class="px-4 py-2 text-sm rounded-full transition-all duration-300 text-gray-600 cursor-not-allowed" title="Скоро будет">
+          Игры
+        </button>
+      </nav>
+    </header>
+
+    <!-- Офлайн-индикатор -->
+    @if (isOffline()) {
+      <div class="w-full text-center bg-yellow-900/50 border border-yellow-700 text-yellow-300 text-sm py-2 px-4 rounded-lg animate-fade-in">
+        Вы оффлайн. Приложение продолжает работать в ограниченном режиме.
+      </div>
+    }
+
+    <!-- Основной контент, который меняется в зависимости от активного вида -->
+    <main class="w-full">
+      @switch (activeView()) {
+        @case ('advice') {
+          <app-advice />
+        }
+        @case ('notes') {
+          <app-notes />
+        }
+        @case ('music') {
+          <app-music />
+        }
+        @case ('games') {
+          <div class="text-center p-10 bg-neutral-800 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-semibold text-gray-500">Раздел с играми в разработке...</h2>
+          </div>
+        }
+      }
+    </main>
+
+    <!-- Подвал страницы -->
+    <footer class="w-full text-center mt-auto pt-8">
+      <p class="text-xs text-gray-500">
+        Katya Pocket v1.1.0 (PWA) | Создано с любовью для уюта и вдохновения.
+      </p>
+    </footer>
+
+  </div>
+</div>
+
+<!-- Стили для анимации появления -->
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+</style>
