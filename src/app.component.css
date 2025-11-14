@@ -1,10 +1,10 @@
-/* Для создания уютной атмосферы можно подключить красивый шрифт, например, Cormorant Garamond */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+/* Для создания уютной атмосферы можно подключить красивый шрифт M PLUS Rounded 1c */
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 
 :host {
-  font-family: 'Inter', sans-serif;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
 h1, h2, h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
 }
