@@ -1,0 +1,52 @@
+<div class="w-full flex flex-col gap-6">
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl sm:text-3xl font-serif text-violet-300">Ассоциации</h2>
+    <a href="#/games" class="text-sm text-gray-400 hover:text-gray-200" aria-label="Назад к списку игр">← Назад к играм</a>
+  </div>
+
+  <div class="bg-neutral-800 rounded-xl p-6 border border-neutral-700/50">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3 text-sm text-gray-400">
+        <label class="text-gray-400">Сложность:</label>
+        <select class="bg-neutral-700 text-gray-200 rounded px-2 py-1" (change)="setDifficulty($any($event.target).value)">
+          <option value="easy">Лёгкая</option>
+          <option value="normal" selected>Средняя</option>
+          <option value="hard">Сложная</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-400">Счёт: <strong class="text-gray-200">{{ score() }}</strong></span>
+        <span class="text-sm text-gray-400">Рекорд: <strong class="text-gray-200">{{ best() }}</strong></span>
+        <span class="text-sm text-gray-400">Время: <strong class="text-gray-200">{{ timeLeft() }}s</strong></span>
+      </div>
+    </div>
+
+    @if (!finished()) {
+      <div class="flex flex-col gap-4">
+        <p class="text-gray-200">Слово:</p>
+        <p class="text-gray-100 text-lg">{{ current().prompt }}</p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+          @for (o of current().options; track o) {
+            <button (click)="toggleOption(o)"
+                    class="px-3 py-2 rounded-lg bg-neutral-700 hover:bg-neutral-600 transition-colors"
+                    [class.bg-violet-700]="selected().has(o)"
+                    aria-pressed="{{ selected().has(o) }}"
+                    [attr.aria-label]="'Вариант ' + o">
+              {{ o }}
+            </button>
+          }
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button (click)="submitRound()" class="px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600" aria-label="Подтвердить выбор и перейти к следующему слову">Далее</button>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-10">
+        <p class="text-xl">Игра окончена! Ваш счёт: <strong>{{ score() }}</strong></p>
+        <button (click)="restart()" class="mt-4 px-5 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600" aria-label="Сыграть ещё раз">Сыграть ещё раз</button>
+      </div>
+    }
+  </div>
+</div>

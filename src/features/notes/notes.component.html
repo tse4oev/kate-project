@@ -1,0 +1,136 @@
+<!-- Основной контейнер для раздела заметок -->
+<div class="w-full flex flex-col gap-6">
+  
+  <!-- Заголовок и панель действий -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+    <h2 class="text-2xl sm:text-3xl font-serif text-violet-300">Мои заметки</h2>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <input 
+        type="search"
+        placeholder="Поиск по за��еткам..."
+        [value]="searchTerm()"
+        (input)="onSearch($event)"
+        class="w-full sm:w-auto px-4 py-2 bg-neutral-800 border border-neutral-700 text-gray-200 placeholder:text-gray-500 rounded-full shadow-inner focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
+      />
+      <button 
+        (click)="openCreateModal()"
+        class="flex-shrink-0 px-4 py-2 bg-violet-500 text-white font-semibold rounded-full shadow-md hover:bg-violet-600 transition-all duration-300 transform hover:scale-105">
+        + Новая
+      </button>
+      <button 
+        (click)="exportAll()"
+        class="flex-shrink-0 px-4 py-2 bg-neutral-700 text-gray-200 rounded-full hover:bg-neutral-600 transition-all"
+        aria-label="Экспортировать все данные в JSON">
+        ⬇️ Экспорт
+      </button>
+      <button 
+        (click)="importAll()"
+        class="flex-shrink-0 px-4 py-2 bg-neutral-700 text-gray-200 rounded-full hover:bg-neutral-600 transition-all"
+        aria-label="Импортировать данные из JSON">
+        ⬆️ Импорт
+      </button>
+    </div>
+  </div>
+
+  <!-- Сетка для отображения заметок -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (note of filteredNotes(); track note.id) {
+      <div class="bg-neutral-800 rounded-xl shadow-lg p-5 flex flex-col justify-between gap-4 border border-neutral-700/50 transition-transform duration-300 hover:-translate-y-1 animate-fade-in-cards">
+        <div>
+          <h3 class="font-serif text-xl text-gray-200 mb-2">{{ note.title }}</h3>
+          <p class="text-sm text-gray-400 whitespace-pre-wrap">{{ note.content }}</p>
+        </div>
+        <div class="flex justify-between items-center mt-4 pt-4 border-t border-neutral-700">
+          <span class="text-xs text-gray-500">{{ note.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          <div class="flex gap-2">
+            <button (click)="openEditModal(note)" class="text-gray-500 hover:text-blue-400 transition-colors" aria-label="Редактировать заметку">✏️</button>
+            <button (click)="deleteNote(note.id)" class="text-gray-500 hover:text-red-400 transition-colors" aria-label="Удалить заметку">🗑️</button>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full text-center py-12 bg-neutral-800/50 rounded-xl">
+        <p class="text-gray-500">У вас пока нет заметок.</p>
+        <p class="text-sm text-gray-400 mt-1">Самое время создать первую!</p>
+      </div>
+    }
+  </div>
+
+</div>
+
+
+<!-- Модальное окно для создания/редактирования заметки -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4 animate-fade-in-fast">
+    
+    <!-- Контейнер модального окна -->
+    <div class="w-full max-w-lg bg-neutral-800 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 relative animate-slide-up border border-neutral-700">
+      <!-- Кнопка закрытия -->
+      <button (click)="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+
+      <!-- Заголовок формы -->
+      <h3 class="text-2xl font-serif text-violet-300">
+        {{ currentNote() ? 'Редактировать заметку' : 'Новая заметка' }}
+      </h3>
+
+      <!-- Поля формы -->
+      <div class="flex flex-col gap-4">
+        <input 
+          type="text"
+          [(ngModel)]="noteTitle"
+          placeholder="Заголовок"
+          class="w-full p-3 bg-neutral-700 border border-neutral-600 text-gray-200 placeholder:text-gray-500 rounded-lg shadow-inner focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
+        />
+        <textarea 
+          [(ngModel)]="noteContent"
+          placeholder="Напишите что-нибудь..."
+          rows="6"
+          class="w-full p-3 bg-neutral-700 border border-neutral-600 text-gray-200 placeholder:text-gray-500 rounded-lg shadow-inner focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="flex justify-end items-center gap-3 mt-4">
+        @if (saveStatus() === 'saved') {
+          <span class="text-green-400 text-sm animate-fade-in">Сохранено ✅</span>
+        }
+        <button 
+          (click)="closeModal()" 
+          [disabled]="saveStatus() === 'saving'" 
+          class="px-5 py-2 text-sm bg-neutral-600 text-gray-300 rounded-lg hover:bg-neutral-500 transition-colors disabled:opacity-50">
+          Отмена
+        </button>
+        <button 
+          (click)="saveNote()" 
+          [disabled]="saveStatus() === 'saving' || saveStatus() === 'saved'" 
+          class="px-5 py-2 text-sm bg-violet-500 text-white font-semibold rounded-lg shadow-md hover:bg-violet-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-wait w-32 text-center">
+          @if (saveStatus() === 'saving') {
+            <span class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Сохранение...
+            </span>
+          } @else {
+            <span>Сохранить</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Стили для анимации модального окна -->
+<style>
+  @keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
+  .animate-fade-in-fast { animation: fadeInFast 0.2s ease-out forwards; }
+  
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
+
+  @keyframes fadeInCards { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-in-cards { animation: fadeInCards 0.25s ease-out; }
+</style>

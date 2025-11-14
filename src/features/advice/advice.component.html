@@ -1,0 +1,82 @@
+<!-- Основной контейнер виджета советов -->
+<div class="w-full p-6 sm:p-8 bg-neutral-800/50 rounded-2xl shadow-lg backdrop-blur-sm border border-neutral-700/50 flex flex-col gap-6 transition-all duration-300">
+  
+  <!-- Заголовок и описание -->
+  <div class="text-center">
+    <h2 class="text-2xl sm:text-3xl font-serif text-violet-300">Нужен совет или идея?</h2>
+    <p class="text-sm text-gray-400 mt-1">Спросите что угодно или выберите готовый вариант.</p>
+  </div>
+
+  <!-- Варианты быстрых запросов -->
+  <div class="flex flex-wrap justify-center gap-3">
+    @for (prompt of presetPrompts; track prompt) {
+      <button 
+        (click)="getAdvice(prompt)"
+        class="px-4 py-2 bg-neutral-700 text-sm text-gray-300 rounded-full shadow-sm transition-all duration-300 hover:bg-neutral-600 hover:shadow-md transform hover:-translate-y-0.5">
+        {{ prompt }}
+      </button>
+    }
+  </div>
+
+  <!-- Форма для пользовательского ввода -->
+  <div class="flex flex-col sm:flex-row gap-3 items-center">
+    <textarea 
+      [(ngModel)]="userPrompt"
+      placeholder="Или напишите свой вопрос здесь..."
+      rows="2"
+      class="w-full flex-grow p-3 bg-neutral-700/50 text-gray-200 placeholder:text-gray-500 border border-neutral-600 rounded-lg shadow-inner focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300 resize-none">
+    </textarea>
+    <button 
+      (click)="getAdvice()"
+      [disabled]="isLoading()"
+      class="w-full sm:w-auto px-6 py-3 bg-violet-500 text-white font-semibold rounded-lg shadow-md hover:bg-violet-600 transition-all duration-300 disabled:bg-neutral-600 disabled:cursor-not-allowed transform hover:scale-105 flex items-center justify-center gap-2">
+      @if (isLoading()) {
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      }
+      <span>Получить совет</span>
+    </button>
+  </div>
+  
+  <!-- Область вывода результата, ошибок или загрузчика -->
+  <div id="advice-output" class="mt-4 min-h-[100px] w-full p-5 bg-neutral-900/50 rounded-xl shadow-inner relative overflow-hidden">
+    @if (isLoading()) {
+      <div class="absolute inset-0 flex items-center justify-center bg-neutral-800/50 transition-opacity duration-300">
+        <div class="flex flex-col items-center gap-2">
+          <div class="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-violet-400"></div>
+          <p class="text-sm text-gray-400">Думаю...</p>
+        </div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="text-center text-red-400 bg-red-900/30 p-4 rounded-lg animate-fade-in">
+        {{ error() }}
+      </div>
+    }
+
+    @if (advice()) {
+      <blockquote class="text-gray-300 prose prose-invert prose-p:my-2 prose-li:my-1 animate-fade-in">
+        <p [innerHTML]="advice()"></p>
+      </blockquote>
+    } @else if (!isLoading() && !error()) {
+       <div class="text-center text-gray-500 flex items-center justify-center h-full">
+        <p>Здесь появится ответ...</p>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- Стили для анимации появления -->
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+</style>
