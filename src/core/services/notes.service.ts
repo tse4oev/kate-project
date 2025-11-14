@@ -74,7 +74,7 @@ export class NotesService {
    * @returns Обновленная заметка или null, если заметка не найдена.
    */
   updateNote(updatedNote: Pick<Note, 'id' | 'title' | 'content'>): Note | null {
-    let notes = this.getNotes();
+    const notes = this.getNotes();
     const noteIndex = notes.findIndex(n => n.id === updatedNote.id);
     if (noteIndex > -1) {
       notes[noteIndex] = { 
